@@ -29,7 +29,6 @@
     *   Whitelist/Blacklist specific items or worlds.
     *   Full control over messages and formatting.
 *   **🔔 Admin Notifications**: Automatic update checks from GitHub/Modrinth with join notifications for admins.
-*   **💾 Auto-Backup**: Creates timestamped JAR backups on every build.
 
 ### ⌨️ Commands & Permissions
 | Command | Description | Permission |
@@ -56,7 +55,6 @@
     *   Danh sách trắng/đen cho từng vật phẩm hoặc thế giới cụ thể.
     *   Toàn quyền kiểm soát tin nhắn và định dạng hiển thị.
 *   **🔔 Thông báo cho Admin**: Tự động kiểm tra cập nhật từ GitHub/Modrinth và thông báo khi Admin vào server.
-*   **💾 Sao lưu tự động**: Tạo bản sao lưu JAR kèm mốc thời gian sau mỗi lần build.
 
 ### ⌨️ Lệnh & Quyền hạn
 | Lệnh | Mô tả | Quyền hạn |
