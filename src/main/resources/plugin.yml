@@ -1,0 +1,15 @@
+main: me.hiyo41.itemtimer.ItemTimer
+name: ItemTimer
+version: '${project.version}'
+api-version: '1.21'
+author: Hiyo41
+description: Displays a countdown timer and information above dropped items and removes them.
+website: https://github.com/hiyo412012
+commands:
+  itemtimer:
+    description: Main command for ItemTimer
+    aliases: [it]
+permissions:
+  itemtimer.admin:
+    description: Allows reloading the configuration
+    default: op

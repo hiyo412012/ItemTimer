@@ -1,0 +1,70 @@
+# ItemTimer Configuration by Hiyo41
+# GitHub: https://github.com/hiyo412012
+
+# DO NOT CHANGE THIS!
+config-version: 1.1
+
+# Kiểm tra cập nhật khi khởi động
+check-update: true
+
+# General Features
+features:
+  # Display name tags above items
+  display-name-tags:
+    enable: true
+    # Đồng bộ ngôn ngữ item theo client của người chơi (Translatable)
+    translate-item-names: true
+    # Sử dụng tên tùy chỉnh của item nếu có?
+    use-custom-name: true
+  
+  # Pulsing effect when time is low
+  pulsing:
+    enable: true
+    start-at: 10
+    color: "&4"
+  
+  # Progress bar display
+  progress-bar:
+    enable: true
+    symbol: "■"
+    size: 10
+    full-color: "&a"
+    empty-color: "&7"
+  
+  # Automatic item removal
+  item-removal:
+    enable: true
+
+# Timer Settings
+timers:
+  # Default time in seconds
+  default: 60
+  
+  # Custom timers for specific materials
+  # Format: MATERIAL_NAME: seconds
+  custom:
+    DIAMOND: 300
+    NETHERITE_INGOT: 600
+    GOLD_INGOT: 120
+
+# World Restrictions
+worlds:
+  # List of worlds where the plugin is ACTIVE
+  # Leave empty ([]) to enable in ALL worlds
+  enabled: []
+  # List of worlds where the plugin is DISABLED
+  disabled: []
+
+# Item Filtering
+items:
+  # Items that should NOT be tracked or removed
+  excluded:
+    - BEDROCK
+    - BARRIER
+    - COMMAND_BLOCK
+  
+  # Only track items with these materials (leave empty for all)
+  whitelist: []
+
+# Build Settings (for pom.xml logic)
+backup-enabled: true

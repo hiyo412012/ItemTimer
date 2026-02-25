@@ -1,0 +1,33 @@
+# ItemTimer Messages by Hiyo41
+# Support color codes using &
+
+# DO NOT CHANGE THIS!
+messages-version: 1.0
+
+prefix: "&8[&6ItemTimer&8] &r"
+
+commands:
+  reload: "&aĐã tải lại cấu hình và ngôn ngữ thành công!"
+  no-permission: "&cBạn không có quyền thực hiện lệnh này."
+  update-found: "&eĐã tìm thấy phiên bản mới: &f{version}&e! Tải tại: &f{url}"
+  update-latest: "&aBạn đang sử dụng phiên bản mới nhất."
+  update-join-notify: "&e[ItemTimer] Phát hiện phiên bản mới: &f{version}&e. Xem ngay tại: &f{url}"
+  usage: "&eCách dùng: &f/it <reload|status|help|check>"
+  help:
+    header: "&6--- ItemTimer Help ---"
+    reload: "&f/it reload &7- Reload config and messages"
+    status: "&f/it status &7- Show plugin status"
+    footer: "&6---------------------"
+  status:
+    header: "&6--- ItemTimer Status ---"
+    version: "&eVersion: &f{version}"
+    author: "&eAuthor: &fHiyo41"
+    tracked-items: "&eTracked Items: &f{amount}"
+    uptime: "&eUptime: &f{uptime}"
+    footer: "&6-----------------------"
+
+# Display Settings for Name Tags
+# Available placeholders: {time}, {name}, {amount}, {progress}
+display:
+  format: "&c⚠ {time} &f| &e{name} &a{amount}x"
+  legacy-name: true # Use legacy material names for older versions?
