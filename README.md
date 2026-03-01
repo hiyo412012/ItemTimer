@@ -28,7 +28,7 @@
     *   Set default and custom timers for specific materials (e.g., Diamond, Netherite).
     *   Whitelist/Blacklist specific items or worlds.
     *   Full control over messages and formatting.
-*   **🔔 Admin Notifications**: Automatic update checks from GitHub/Modrinth with join notifications for admins.
+*   **🔔 Admin Notifications**: Automatic update checks from GitHub with join notifications for admins.
 
 ### ⌨️ Commands & Permissions
 | Command | Description | Permission |
@@ -54,7 +54,7 @@
     *   Thiết lập thời gian mặc định và riêng biệt cho từng loại vật phẩm (ví dụ: Kim cương, Netherite).
     *   Danh sách trắng/đen cho từng vật phẩm hoặc thế giới cụ thể.
     *   Toàn quyền kiểm soát tin nhắn và định dạng hiển thị.
-*   **🔔 Thông báo cho Admin**: Tự động kiểm tra cập nhật từ GitHub/Modrinth và thông báo khi Admin vào server.
+*   **🔔 Thông báo cho Admin**: Tự động kiểm tra cập nhật từ GitHub và thông báo khi Admin vào server.
 
 ### ⌨️ Lệnh & Quyền hạn
 | Lệnh | Mô tả | Quyền hạn |
@@ -68,7 +68,6 @@
 
 ### 🔗 Links
 *   **GitHub**: [hiyo412012/ItemTimer](https://github.com/hiyo412012/ItemTimer)
-*   **Modrinth**: [ItemTimer (ID: tHdlHUer)](https://modrinth.com/plugin/itemtimer)
 
 ---
 <div align="center">
