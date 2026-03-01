@@ -2,7 +2,7 @@
 # GitHub: https://github.com/hiyo412012
 
 # DO NOT CHANGE THIS!
-config-version: 1.1
+config-version: 1.2
 
 # Kiểm tra cập nhật khi khởi động
 check-update: true
@@ -34,6 +34,14 @@ features:
   # Automatic item removal
   item-removal:
     enable: true
+
+  # Âm thanh khi thời gian chuẩn bị hết (<= 5s)
+  low-time-sound:
+    enable: true
+    sound: "BLOCK_NOTE_BLOCK_HAT"
+    volume: 1.0
+    pitch: 1.0
+    time: 5
 
 # Timer Settings
 timers:
