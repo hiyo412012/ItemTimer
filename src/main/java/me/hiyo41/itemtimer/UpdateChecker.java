@@ -11,7 +11,6 @@ public class UpdateChecker {
 
     private final ItemTimer plugin;
     private final String githubUrl = "https://api.github.com/repos/hiyo412012/ItemTimer/releases/latest";
-    private final String modrinthUrl = "https://api.modrinth.com/v2/project/tHdlHUer/version";
 
     public UpdateChecker(ItemTimer plugin) {
         this.plugin = plugin;
@@ -19,19 +18,11 @@ public class UpdateChecker {
 
     public void checkUpdate(final Consumer<UpdateResult> consumer) {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            // Check GitHub first
             UpdateResult githubResult = checkGitHub();
             if (githubResult != null && isNewer(githubResult.version)) {
                 consumer.accept(githubResult);
-                return;
-            }
-
-            // If GitHub fails or is not newer, check Modrinth
-            UpdateResult modrinthResult = checkModrinth();
-            if (modrinthResult != null && isNewer(modrinthResult.version)) {
-                consumer.accept(modrinthResult);
             } else {
-                consumer.accept(null); // No update found or error
+                consumer.accept(null);
             }
         });
     }
@@ -54,29 +45,6 @@ public class UpdateChecker {
                 String version = json.split("\"tag_name\":\"")[1].split("\"")[0];
                 String url = json.split("\"html_url\":\"")[1].split("\"")[0];
                 return new UpdateResult(version, url, "GitHub");
-            }
-        } catch (Exception ignored) {}
-        return null;
-    }
-
-    private UpdateResult checkModrinth() {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(modrinthUrl).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "ItemTimer-Plugin");
-
-            if (connection.getResponseCode() == 200) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) response.append(line);
-                reader.close();
-
-                String json = response.toString();
-                // Modrinth returns an array of versions, the first one is the latest
-                String version = json.split("\"version_number\":\"")[1].split("\"")[0];
-                String url = "https://modrinth.com/plugin/itemtimer"; // Static link for convenience
-                return new UpdateResult(version, url, "Modrinth");
             }
         } catch (Exception ignored) {}
         return null;
