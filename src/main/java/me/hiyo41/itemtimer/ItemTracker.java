@@ -2,9 +2,12 @@ package me.hiyo41.itemtimer;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -12,49 +15,91 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ItemTracker implements Listener {
     private final ItemTimer plugin;
     private final ConfigManager config;
-    private final Map<UUID, Integer> itemTimers = new HashMap<>();
-    private final Map<UUID, Integer> maxTimers = new HashMap<>();
     private BukkitTask updateTask;
+    
+    private final NamespacedKey timeKey;
+    private final NamespacedKey maxTimeKey;
+    private int trackedCount = 0;
 
     public ItemTracker(ItemTimer plugin, ConfigManager config) {
         this.plugin = plugin;
         this.config = config;
+        this.timeKey = new NamespacedKey(plugin, "timer");
+        this.maxTimeKey = new NamespacedKey(plugin, "max_timer");
         startTask();
     }
 
     private void startTask() {
         updateTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            itemTimers.entrySet().removeIf(entry -> {
-                Item item = (Item) Bukkit.getEntity(entry.getKey());
-                if (item == null || !item.isValid() || item.isDead()) {
-                    maxTimers.remove(entry.getKey());
-                    return true;
-                }
-
-                int remaining = entry.getValue() - 1;
-                if (remaining <= 0) {
-                    if (config.isItemRemovalEnabled()) {
-                        item.remove();
+            Set<Block> playedSounds = new HashSet<>();
+            int countTemp = 0;
+            
+            for (World world : Bukkit.getWorlds()) {
+                for (Item item : world.getEntitiesByClass(Item.class)) {
+                    if (!item.isValid() || item.isDead()) continue;
+                    
+                    PersistentDataContainer pdc = item.getPersistentDataContainer();
+                    
+                    int remaining;
+                    int max;
+                    
+                    if (pdc.has(timeKey, PersistentDataType.INTEGER)) {
+                        remaining = pdc.get(timeKey, PersistentDataType.INTEGER);
+                        max = pdc.getOrDefault(maxTimeKey, PersistentDataType.INTEGER, remaining);
+                    } else {
+                        // Not tracked previously
+                        if (!shouldTrack(item)) continue;
+                        remaining = getInitialTime(item);
+                        max = remaining;
+                        pdc.set(maxTimeKey, PersistentDataType.INTEGER, max);
                     }
-                    maxTimers.remove(entry.getKey());
-                    return true;
+                    
+                    remaining--; // giam thoi gian tung giay
+                    
+                    if (remaining <= 0) {
+                        if (config.isItemRemovalEnabled()) {
+                            item.remove();
+                        } else {
+                            pdc.remove(timeKey);
+                            pdc.remove(maxTimeKey);
+                            item.setCustomNameVisible(false);
+                        }
+                        continue;
+                    }
+                    
+                    countTemp++;
+                    pdc.set(timeKey, PersistentDataType.INTEGER, remaining);
+                    
+                    if (config.isDisplayNameTags()) {
+                        updateItemDisplay(item, remaining, max);
+                    }
+                    
+                    // Sound when time is low
+                    if (config.isLowTimeSoundEnabled() && remaining <= config.getLowTimeSoundTime()) {
+                        Block b = item.getLocation().getBlock();
+                        if (!playedSounds.contains(b)) {
+                            try {
+                                Sound sound = Sound.valueOf(config.getLowTimeSoundValue());
+                                world.playSound(item.getLocation(), sound, config.getLowTimeSoundVolume(), config.getLowTimeSoundPitch());
+                                playedSounds.add(b);
+                            } catch (IllegalArgumentException e) {
+                                // Invalid sound effect, do nothing
+                            }
+                        }
+                    }
                 }
-
-                entry.setValue(remaining);
-                if (config.isDisplayNameTags()) {
-                    updateItemDisplay(item, remaining, maxTimers.get(entry.getKey()));
-                }
-                return false;
-            });
+            }
+            this.trackedCount = countTemp;
         }, 20L, 20L);
     }
 
@@ -64,8 +109,9 @@ public class ItemTracker implements Listener {
         if (!shouldTrack(item)) return;
 
         int time = getInitialTime(item);
-        itemTimers.put(item.getUniqueId(), time);
-        maxTimers.put(item.getUniqueId(), time);
+        PersistentDataContainer pdc = item.getPersistentDataContainer();
+        pdc.set(timeKey, PersistentDataType.INTEGER, time);
+        pdc.set(maxTimeKey, PersistentDataType.INTEGER, time);
         
         if (config.isDisplayNameTags()) {
             updateItemDisplay(item, time, time);
@@ -76,21 +122,21 @@ public class ItemTracker implements Listener {
     public void onItemMerge(ItemMergeEvent event) {
         Item target = event.getTarget();
         Item source = event.getEntity();
+        
+        PersistentDataContainer pdcT = target.getPersistentDataContainer();
+        PersistentDataContainer pdcS = source.getPersistentDataContainer();
 
-        if (itemTimers.containsKey(target.getUniqueId()) && itemTimers.containsKey(source.getUniqueId())) {
-            int timeT = itemTimers.get(target.getUniqueId());
-            int timeS = itemTimers.get(source.getUniqueId());
-            int maxT = maxTimers.get(target.getUniqueId());
-            int maxS = maxTimers.get(source.getUniqueId());
+        if (pdcT.has(timeKey, PersistentDataType.INTEGER) && pdcS.has(timeKey, PersistentDataType.INTEGER)) {
+            int timeT = pdcT.get(timeKey, PersistentDataType.INTEGER);
+            int timeS = pdcS.get(timeKey, PersistentDataType.INTEGER);
+            int maxT = pdcT.getOrDefault(maxTimeKey, PersistentDataType.INTEGER, timeT);
+            int maxS = pdcS.getOrDefault(maxTimeKey, PersistentDataType.INTEGER, timeS);
             
             int newTime = Math.max(timeT, timeS);
             int newMax = Math.max(maxT, maxS);
             
-            itemTimers.put(target.getUniqueId(), newTime);
-            maxTimers.put(target.getUniqueId(), newMax);
-            
-            itemTimers.remove(source.getUniqueId());
-            maxTimers.remove(source.getUniqueId());
+            pdcT.set(timeKey, PersistentDataType.INTEGER, newTime);
+            pdcT.set(maxTimeKey, PersistentDataType.INTEGER, newMax);
             
             if (config.isDisplayNameTags()) {
                 Bukkit.getScheduler().runTask(plugin, () -> updateItemDisplay(target, newTime, newMax));
@@ -140,7 +186,8 @@ public class ItemTracker implements Listener {
 
         Component timeComp = Component.text(timeStr);
         if (pulsing) {
-            timeComp = timeComp.color(NamedTextColor.DARK_RED);
+            LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
+            timeComp = timeComp.color(serializer.deserialize(config.getPulsingColor()).color());
         } else {
             timeComp = timeComp.color(NamedTextColor.RED);
         }
@@ -148,7 +195,6 @@ public class ItemTracker implements Listener {
         Component progressComp = config.isProgressBarEnabled() ? getProgressBarComponent(seconds, max) : Component.empty();
         Component amountComp = Component.text(stack.getAmount()).color(NamedTextColor.GREEN);
 
-        // We use a custom parser to replace placeholders in the format string with Components
         Component finalDisplay = parseFormat(format, timeComp, nameComponent, amountComp, progressComp);
 
         item.customName(finalDisplay);
@@ -156,7 +202,6 @@ public class ItemTracker implements Listener {
     }
 
     private Component parseFormat(String format, Component time, Component name, Component amount, Component progress) {
-        // Simple manual replacement for Adventure
         String[] parts = format.split("(?=\\{)|(?<=\\})");
         Component result = Component.empty();
         LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
@@ -176,7 +221,6 @@ public class ItemTracker implements Listener {
                     result = result.append(progress);
                     break;
                 default:
-                    // Colorize the literal parts
                     result = result.append(serializer.deserialize(part.replace("{", "").replace("}", "")));
                     break;
             }
@@ -222,11 +266,9 @@ public class ItemTracker implements Listener {
 
     public void cleanup() {
         if (updateTask != null) updateTask.cancel();
-        itemTimers.clear();
-        maxTimers.clear();
     }
 
     public int getTrackedCount() {
-        return itemTimers.size();
+        return trackedCount;
     }
 }

@@ -35,6 +35,14 @@ features:
   item-removal:
     enable: true
 
+  # Âm thanh khi thời gian chuẩn bị hết (<= 5s)
+  low-time-sound:
+    enable: true
+    sound: "BLOCK_NOTE_BLOCK_HAT"
+    volume: 1.0
+    pitch: 1.0
+    time: 5
+
 # Timer Settings
 timers:
   # Default time in seconds

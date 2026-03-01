@@ -27,6 +27,13 @@ public class ConfigManager {
     private boolean itemRemovalEnabled;
     private boolean checkUpdate;
 
+    // Sound
+    private boolean lowTimeSoundEnabled;
+    private String lowTimeSoundValue;
+    private float lowTimeSoundVolume;
+    private float lowTimeSoundPitch;
+    private int lowTimeSoundTime;
+
     // Settings
     private int defaultTimer;
     private Map<String, Integer> customTimers = new HashMap<>();
@@ -88,6 +95,13 @@ public class ConfigManager {
         progressBarEnabled = config.getBoolean("features.progress-bar.enable", true);
         itemRemovalEnabled = config.getBoolean("features.item-removal.enable", true);
 
+        // Sound
+        lowTimeSoundEnabled = config.getBoolean("features.low-time-sound.enable", true);
+        lowTimeSoundValue = config.getString("features.low-time-sound.sound", "BLOCK_NOTE_BLOCK_HAT");
+        lowTimeSoundVolume = (float) config.getDouble("features.low-time-sound.volume", 1.0);
+        lowTimeSoundPitch = (float) config.getDouble("features.low-time-sound.pitch", 1.0);
+        lowTimeSoundTime = config.getInt("features.low-time-sound.time", 5);
+
         // Settings
         defaultTimer = config.getInt("timers.default", 60);
         pulsingStartAt = config.getInt("features.pulsing.start-at", 10);
@@ -139,6 +153,11 @@ public class ConfigManager {
     public int getProgressSize() { return progressSize; }
     public String getProgressFullColor() { return progressFullColor; }
     public String getProgressEmptyColor() { return progressEmptyColor; }
+    public boolean isLowTimeSoundEnabled() { return lowTimeSoundEnabled; }
+    public String getLowTimeSoundValue() { return lowTimeSoundValue; }
+    public float getLowTimeSoundVolume() { return lowTimeSoundVolume; }
+    public float getLowTimeSoundPitch() { return lowTimeSoundPitch; }
+    public int getLowTimeSoundTime() { return lowTimeSoundTime; }
     public List<String> getEnabledWorlds() { return enabledWorlds; }
     public List<String> getDisabledWorlds() { return disabledWorlds; }
     public List<String> getExcludedItems() { return excludedItems; }
