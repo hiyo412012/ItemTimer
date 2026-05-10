@@ -9,6 +9,8 @@
 
 ---
 
+### Hiện Tại Tôi Đã Dừng Hoạt Động Cập Nhật Dự Án Này, Vì Tôi Đang Có Một Dự Án Lớn Hơn Và Có Thích Hợp Nó Vào. | I have currently stopped updating this project because I have a larger project that I need to focus on.
+
 ## 🌏 Language / Ngôn ngữ
 [**English**](#english-version) | [**Tiếng Việt**](#phiên-bản-tiếng-việt)
 
